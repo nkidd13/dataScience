@@ -1,0 +1,62 @@
+---
+title: "2.3 Vizualizing categorical variables."
+author: "Natalie Kidd"
+date: "December 7, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+  library(ggplot2)
+```
+
+# Introduction: 
+
+There is an ice cream shop, that is operating in New York, LA, and San Francisco. 
+
+# Data: 
+
+* You have sold 12,327 ice creams in New York. 
+* 17,129 in LA
+* 19923 in San Francisco. 
+
+# Frequency Distribution table.   
+```{R}
+  class <- c("NY", "LA", "SF")
+  amount <- c(12327, 17129, 19923)
+  sales <- data.frame(class, amount, stringsAsFactors =   FALSE)
+  
+  sales <- cbind(sales, relativeFreq =   sales$amount/sum(sales$amount))
+  sales <- rbind(sales, data.frame(class = "Total",   amount = sum(sales$amount), relativeFreq =   sum(sales$relativeFreq)))
+  print(sales)
+
+```
+
+# Barplot
+
+```{r}
+  p1<-ggplot(sales, aes(x= reorder(class, amount), y=amount)) +
+  geom_bar(stat="identity", fill = "steelblue") + labs(x = "City / Category", y = "sales") + geom_text(aes(label = amount), vjust = 1.6, color = "white", size = 3.5) + theme_minimal()
+plot(p1)
+```
+
+# Piechart
+```{r}
+  p2 <- ggplot(sales[1:3,], aes(x = "", y=relativeFreq, fill = class)) + 
+  geom_bar(width = 1, stat = "identity") + 
+  labs(fill="class", x=NULL, y=NULL) + 
+  coord_polar(theta = "y", start = 0)
+  plot(p2)
+```
+
+# Pareto Diagram: 
+```{r}
+  sales <- cbind(sales, cumFreq = cumsum(sales$amount))
+  print(sales)
+
+  p3<-ggplot(sales[1:3,], aes(x= reorder(class, amount), y=amount)) +
+  geom_bar(stat="identity") + labs(y = "amount") + geom_point(aes (x = class, y = cumFreq)) + 
+  geom_path(aes(y=sales[1:3,]$cumFreq, group=1), colour="slateblue1")
+  plot(p3)
+```
+
